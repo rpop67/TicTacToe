@@ -14,6 +14,7 @@ public class MainActivity extends AppCompatActivity {
 
     int count;
     int prev;
+    int winFlag;
     CircleButton b1;
     CircleButton b2;
     CircleButton b3;
@@ -23,6 +24,7 @@ public class MainActivity extends AppCompatActivity {
     CircleButton b7;
     CircleButton b8;
     CircleButton b9;
+    CircleButton resetButton;
     TextView display;
     Player playerA;
     Player playerB;
@@ -47,11 +49,14 @@ public class MainActivity extends AppCompatActivity {
         b7 = findViewById(R.id.button7);
         b8 = findViewById(R.id.button8);
         b9 = findViewById(R.id.button9);
+        resetButton=findViewById(R.id.resetButton);
         display = findViewById(R.id.displayPlayer);
         playerA = new Player();
         playerB = new Player();
         card = findViewById(R.id.card);
         display.setText("player name goes here");
+        winFlag=0;
+
         startGame();
 
         b1.setOnClickListener(new OnClickListener() {
@@ -59,14 +64,16 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 count++;
-                TicTacToeMatrix[0] = 1;
                 b1.setColor(whichColor());
                 b1.setEnabled(false);
                 if (playerA.isPlaying() == 1) {
+                    TicTacToeMatrix[0] = 1;
                     playerA.setNotPlaying();
                     playerB.setPlaying();
 
+
                 } else {
+                    TicTacToeMatrix[0] = 2;
                     playerB.setNotPlaying();
                     playerA.setPlaying();
 
@@ -190,7 +197,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 count++;
-                TicTacToeMatrix[6] = 1;
+
                 b7.setColor(whichColor());
                 b7.setEnabled(false);
                 if (playerA.isPlaying() == 1) {
@@ -212,7 +219,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 count++;
-                TicTacToeMatrix[7] = 1;
+
                 b8.setColor(whichColor());
                 b8.setEnabled(false);
                 if (playerA.isPlaying() == 1) {
@@ -251,6 +258,12 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        resetButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Reset();
+            }
+        });
 
     }
 
@@ -259,106 +272,131 @@ public class MainActivity extends AppCompatActivity {
 
         playerA.setPlaying();
         display.setText("Player A on the roll");
+        for(int i=0;i<9;i++)
+        {
+            TicTacToeMatrix[i]=-1;
+        }
+        winFlag=0;
+        count=0;
     }
 
 
-    public int playedTurn() {
-
-
-        if (count == prev + 1) {
-            prev = count;
-            return 1;
-        } else
-            return 0;
-    }
 
     public void checkTurns() {
-        if (playerA.getTurns() + playerB.getTurns() == 10) {
-            display.setText("A : " + playerA.getTurns() + " B: " + playerB.getTurns());
+        if (playerA.getTurns() + playerB.getTurns() >= 10) {
+            if(winFlag==0)
+            {
+                display.setText(" OOPS! It is a tie");
+            }
+
+        }
+        else
+        {
+            if(playerB.isPlaying()==1)
+            {
+                display.setText("Player B on the roll");
+            }
+            else if(playerA.isPlaying()==1)
+            {
+                display.setText("Player A on the roll");
+            }
         }
     }
 
     public void check() {
         checkTurns();
+
         //logic to know if a line has been formed by any player
 
-        //first row
 
+        if(topRow()==1|| secondRow()==1 || thirdRow()==1 || firstCol()==1 || secondCol()==1 ||thirdCol()==1 || rightDiag()==1 || leftDiag()==1 )
+        {
+            display.setText("Player A is winner !!");
+            winFlag=1;
+            disableAll();
 
+        }
+        if(topRow()==2|| secondRow()==2 || thirdRow()==2 || firstCol()==2 || secondCol()==2 ||thirdCol()==2 || rightDiag()==2 || leftDiag()==2 )
+        {
+            display.setText("Player B is winner !!");
+            winFlag=1;
+            disableAll();
+
+        }
     }
 
-    public boolean topRow() {
-        if (TicTacToeMatrix[0] == 1 && TicTacToeMatrix[1] == 1 && TicTacToeMatrix[2] == 1) {
-            return true;
+    public int topRow() {
+        if (TicTacToeMatrix[0]!=0 && TicTacToeMatrix[0] ==  TicTacToeMatrix[1]  && TicTacToeMatrix[2] == TicTacToeMatrix[1]  ) {
+            return TicTacToeMatrix[0];
         } else
-            return false;
+            return -1;
     }
 
-    public boolean secondRow() {
-        if (TicTacToeMatrix[3] == 1 && TicTacToeMatrix[4] == 1 && TicTacToeMatrix[5] == 1) {
-            return true;
+    public int secondRow() {
+        if (TicTacToeMatrix[3]!=0 && TicTacToeMatrix[3] == TicTacToeMatrix[4]  && TicTacToeMatrix[5] ==TicTacToeMatrix[4] ) {
+            return TicTacToeMatrix[3];
         } else
-            return false;
+            return -1;
 
     }
-    public boolean thirdRow()
+    public int thirdRow()
     {
-        if (TicTacToeMatrix[6]==1 && TicTacToeMatrix[7]==1 && TicTacToeMatrix[8]==1)
+        if (TicTacToeMatrix[6]!=0 && TicTacToeMatrix[6]== TicTacToeMatrix[7] && TicTacToeMatrix[8]==TicTacToeMatrix[7])
         {
-            return true;
+            return TicTacToeMatrix[6];
         }
         else
-            return false;
+            return -1;
     }
 
-    public boolean firstCol()
+    public int firstCol()
     {
-        if (TicTacToeMatrix[0]==1 && TicTacToeMatrix[3]==1 && TicTacToeMatrix[6]==1)
+        if (TicTacToeMatrix[0]!=0 && TicTacToeMatrix[0]==TicTacToeMatrix[3] && TicTacToeMatrix[3]== TicTacToeMatrix[6])
         {
-            return true;
+            return TicTacToeMatrix[0];
         }
         else
-            return false;
+            return -1;
     }
 
-    public boolean secondCol()
+    public int secondCol()
     {
-        if (TicTacToeMatrix[1]==1 && TicTacToeMatrix[4]==1 && TicTacToeMatrix[7]==1)
+        if (TicTacToeMatrix[1]!=0 && TicTacToeMatrix[1]== TicTacToeMatrix[4] && TicTacToeMatrix[7]==TicTacToeMatrix[4])
         {
-            return true;
+            return TicTacToeMatrix[1];
         }
         else
-            return false;
+            return -1;
     }
 
-    public boolean thirdCol()
+    public int thirdCol()
     {
-        if (TicTacToeMatrix[2]==1 && TicTacToeMatrix[5]==1 && TicTacToeMatrix[8]==1)
+        if (TicTacToeMatrix[2]!=0 && TicTacToeMatrix[2]== TicTacToeMatrix[5] && TicTacToeMatrix[8]==TicTacToeMatrix[5])
         {
-            return true;
+            return TicTacToeMatrix[2];
         }
         else
-            return false;
+            return -1;
     }
 
-    public boolean rightDiag()
+    public int rightDiag()
     {
-        if (TicTacToeMatrix[2]==1 && TicTacToeMatrix[4]==1 && TicTacToeMatrix[6]==1)
+        if (TicTacToeMatrix[2]!=0 && TicTacToeMatrix[2]== TicTacToeMatrix[4] && TicTacToeMatrix[6]==TicTacToeMatrix[4])
         {
-            return true;
+            return TicTacToeMatrix[2];
         }
         else
-            return false;
+            return -1;
     }
 
-    public boolean leftDiag()
+    public int leftDiag()
     {
-        if (TicTacToeMatrix[0]==1 && TicTacToeMatrix[4]==1 && TicTacToeMatrix[8]==1)
+        if (TicTacToeMatrix[0]!=0 && TicTacToeMatrix[0]== TicTacToeMatrix[4] && TicTacToeMatrix[8]==TicTacToeMatrix[4] )
         {
-            return true;
+            return TicTacToeMatrix[0];
         }
         else
-            return false;
+            return -1;
     }
 
     public int whichColor() {
@@ -369,6 +407,44 @@ public class MainActivity extends AppCompatActivity {
             color = getResources().getColor(R.color.colorB);
         }
         return color;
+    }
+
+    public void disableAll()
+    {
+        b1.setEnabled(false);
+        b2.setEnabled(false);
+        b3.setEnabled(false);
+        b4.setEnabled(false);
+        b5.setEnabled(false);
+        b6.setEnabled(false);
+        b7.setEnabled(false);
+        b8.setEnabled(false);
+        b9.setEnabled(false);
+
+
+    }
+    public void Reset()
+    {
+        b1.setColor(getResources().getColor(R.color.lightgray));
+        b2.setColor(getResources().getColor(R.color.lightgray));
+        b3.setColor(getResources().getColor(R.color.lightgray));
+        b4.setColor(getResources().getColor(R.color.lightgray));
+        b5.setColor(getResources().getColor(R.color.lightgray));
+        b6.setColor(getResources().getColor(R.color.lightgray));
+        b7.setColor(getResources().getColor(R.color.lightgray));
+        b8.setColor(getResources().getColor(R.color.lightgray));
+        b9.setColor(getResources().getColor(R.color.lightgray));
+        b1.setEnabled(true);
+        b2.setEnabled(true);
+        b3.setEnabled(true);
+        b4.setEnabled(true);
+        b5.setEnabled(true);
+        b6.setEnabled(true);
+        b7.setEnabled(true);
+        b8.setEnabled(true);
+        b9.setEnabled(true);
+
+        startGame();
     }
 
 
